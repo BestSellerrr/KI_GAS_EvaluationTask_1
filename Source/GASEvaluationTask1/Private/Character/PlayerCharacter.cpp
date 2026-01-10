@@ -4,6 +4,7 @@
 #include "Character/PlayerCharacter.h"
 #include "AbilitySystemComponent.h"
 #include "GameplayAbilitySystem/AttributeSet/PlayerAttributeSet.h"
+#include "EnhancedInputComponent.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -24,6 +25,18 @@ void APlayerCharacter::BeginPlay()
 	if (AbilitySystemComponent)
 	{
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
+
+		if (FireBall)
+		{
+			FGameplayAbilitySpecHandle GivenHandle = AbilitySystemComponent->GiveAbility(
+				FGameplayAbilitySpec(
+					FireBall,
+					1,
+					static_cast<int32>(EAbilityID::FireBall),
+					this
+				)
+			);
+		}
 	}
 }
 
@@ -44,5 +57,18 @@ void APlayerCharacter::SetupPlayerInputComponent(UInputComponent* PlayerInputCom
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
 
+	UEnhancedInputComponent* EnhancedInput = Cast<UEnhancedInputComponent>(PlayerInputComponent);
+	if (EnhancedInput)
+	{
+		EnhancedInput->BindAction(IA_FireBall, ETriggerEvent::Started, this, &APlayerCharacter::OnAbilityFireBall);
+	}
+}
+
+void APlayerCharacter::OnAbilityFireBall()
+{
+	if (AbilitySystemComponent)
+	{
+		AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(EAbilityID::FireBall));
+	}
 }
 

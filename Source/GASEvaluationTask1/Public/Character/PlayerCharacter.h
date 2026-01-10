@@ -5,9 +5,16 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayEffectTypes.h"
 #include "PlayerCharacter.generated.h"
 
 class UPlayerAttributeSet;
+
+UENUM(BlueprintType)
+enum class EAbilityID : uint8
+{
+	FireBall
+};
 
 UCLASS()
 class GASEVALUATIONTASK1_API APlayerCharacter : public ACharacter, public IAbilitySystemInterface
@@ -27,9 +34,17 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void OnAbilityFireBall();
+
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ability")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASC|Component")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASC|Ability")
+	TSubclassOf<UGameplayAbility> FireBall = nullptr;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASC|Input")
+	TObjectPtr<class UInputAction> IA_FireBall = nullptr;
 
 private:
 	UPROPERTY()

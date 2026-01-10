@@ -12,8 +12,8 @@ struct FFireBallDamageStatics
 
 	FFireBallDamageStatics()
 	{
-		DEFINE_ATTRIBUTE_CAPTUREDEF(UPlayerAttributeSet, PlayerAttPower, Source, true);
 		DEFINE_ATTRIBUTE_CAPTUREDEF(UEnemyAttributeSet, EnemyHealth, Target, false);
+		DEFINE_ATTRIBUTE_CAPTUREDEF(UPlayerAttributeSet, PlayerAttPower, Source, true);
 	}
 };
 
@@ -36,8 +36,8 @@ void UGEEC_FireBallDamage::Execute_Implementation(
 	const FGameplayEffectCustomExecutionParameters& ExecutionParams, 
 	FGameplayEffectCustomExecutionOutput& OutExecutionOutput) const
 {
-	UAbilitySystemComponent* TargetASC = ExecutionParams.GetTargetAbilitySystemComponent();
 	UAbilitySystemComponent* SourceASC = ExecutionParams.GetSourceAbilitySystemComponent();
+	UAbilitySystemComponent* TargetASC = ExecutionParams.GetTargetAbilitySystemComponent();
 
 	if (TargetASC && SourceASC)
 	{
@@ -63,7 +63,7 @@ void UGEEC_FireBallDamage::Execute_Implementation(
 		}
 		else
 		{
-			
+			UE_LOG(LogTemp, Log, TEXT("GEEC_FireBallDamage : Fail PlayerAttackPower"));
 		}
 
 		if (SourceTags && SourceTags->HasTag(Tag_ElementFire) && 
