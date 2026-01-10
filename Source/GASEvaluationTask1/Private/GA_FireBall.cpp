@@ -75,9 +75,11 @@ void UGA_FireBall::ApplyEffect(AActor* OtherActor)
 
 	FGameplayEffectContextHandle EffectContext = SourceASC->MakeEffectContext();
 	EffectContext.AddSourceObject(this);
-	FGameplayEffectSpecHandle EffectSpec = SourceASC->MakeOutgoingSpec(FireBallEffect, GetAbilityLevel(), EffectContext);
-	if (EffectSpec.IsValid())
+	FGameplayEffectSpecHandle EffectSpecAbility = SourceASC->MakeOutgoingSpec(FireBallEffect, GetAbilityLevel(), EffectContext);
+	FGameplayEffectSpecHandle EffectSpecDebuff = SourceASC->MakeOutgoingSpec(BurnEffect, GetAbilityLevel(), EffectContext);
+	if (EffectSpecAbility.IsValid())
 	{
-		TargetASC->ApplyGameplayEffectSpecToSelf(*EffectSpec.Data.Get());
+		TargetASC->ApplyGameplayEffectSpecToSelf(*EffectSpecAbility.Data.Get());
+		TargetASC->ApplyGameplayEffectSpecToSelf(*EffectSpecDebuff.Data.Get());
 	}
 }
