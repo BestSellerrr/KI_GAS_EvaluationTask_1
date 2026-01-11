@@ -5,6 +5,12 @@
 #include "AbilitySystemComponent.h"
 #include "GameplayAbilitySystem/AttributeSet/PlayerAttributeSet.h"
 #include "EnhancedInputComponent.h"
+#include "Interface/UpdateWidgetInterface.h"
+#include "UI/PlayerHUD.h"
+#include "Kismet/GameplayStatics.h"
+#include "GameFramework/PlayerController.h"
+#include "Blueprint/UserWidget.h"
+#include "DrawDebugHelpers.h"
 
 // Sets default values
 APlayerCharacter::APlayerCharacter()
@@ -15,6 +21,8 @@ APlayerCharacter::APlayerCharacter()
 	AbilitySystemComponent = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("AbilitySystemComponent"));
 
 	PlayerAttributeSet = CreateDefaultSubobject<UPlayerAttributeSet>(TEXT("PlayerAttributeSet"));
+
+	
 }
 
 // Called when the game starts or when spawned
@@ -22,6 +30,17 @@ void APlayerCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	if (!PlayerHud)
+	{
+		if (APlayerController* PC = UGameplayStatics::GetPlayerController(GetWorld(), 0))
+		{
+			if (AHUD* HUD = PC->GetHUD())
+			{
+				PlayerHud = Cast<APlayerHUD>(HUD);
+			}
+		}
+	}
+
 	if (AbilitySystemComponent)
 	{
 		AbilitySystemComponent->InitAbilityActorInfo(this, this);
@@ -37,7 +56,31 @@ void APlayerCharacter::BeginPlay()
 				)
 			);
 		}
+
+		FOnGameplayAttributeValueChange& OnCurrentManaChange =
+			AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UPlayerAttributeSet::GetPlayerManaAttribute());
+		OnCurrentManaChange.AddUObject(this, &APlayerCharacter::OnCurrentManaChange);
+
+		FOnGameplayAttributeValueChange& OnMaxManaChange =
+			AbilitySystemComponent->GetGameplayAttributeValueChangeDelegate(UPlayerAttributeSet::GetPlayerMaxManaAttribute());
+		OnMaxManaChange.AddUObject(this, &APlayerCharacter::OnMaxManaChange);
 	}
+
+	if (PlayerAttributeSet)
+	{
+		if (PlayerHud)
+		{
+			if (UUserWidget* WidgetInstance = PlayerHud->GetPlayerWidgetInstance())
+			{
+				if (WidgetInstance->GetClass()->ImplementsInterface(UUpdateWidgetInterface::StaticClass()))
+				{
+					IUpdateWidgetInterface::Execute_UpdateMaxMana(WidgetInstance, PlayerAttributeSet->GetPlayerMaxMana());
+					IUpdateWidgetInterface::Execute_UpdateCurrentMana(WidgetInstance, PlayerAttributeSet->GetPlayerMana());
+				}
+			}
+		}
+	}
+
 }
 
 // Called every frame
@@ -69,6 +112,34 @@ void APlayerCharacter::OnAbilityFireBall()
 	if (AbilitySystemComponent)
 	{
 		AbilitySystemComponent->AbilityLocalInputPressed(static_cast<int32>(EAbilityID::FireBall));
+	}
+}
+
+void APlayerCharacter::OnMaxManaChange(const FOnAttributeChangeData& InData)
+{
+	if (PlayerAttributeSet && PlayerHud)
+	{
+		if (UUserWidget* WidgetInstance = PlayerHud->GetPlayerWidgetInstance())
+		{
+			if (WidgetInstance->GetClass()->ImplementsInterface(UUpdateWidgetInterface::StaticClass()))
+			{
+				IUpdateWidgetInterface::Execute_UpdateMaxMana(WidgetInstance, PlayerAttributeSet->GetPlayerMaxMana());
+			}
+		}
+	}
+}
+
+void APlayerCharacter::OnCurrentManaChange(const FOnAttributeChangeData& InData)
+{
+	if (PlayerAttributeSet && PlayerHud)
+	{
+		if (UUserWidget* WidgetInstance = PlayerHud->GetPlayerWidgetInstance())
+		{
+			if (WidgetInstance->GetClass()->ImplementsInterface(UUpdateWidgetInterface::StaticClass()))
+			{
+				IUpdateWidgetInterface::Execute_UpdateCurrentMana(WidgetInstance, PlayerAttributeSet->GetPlayerMana());
+			}
+		}
 	}
 }
 

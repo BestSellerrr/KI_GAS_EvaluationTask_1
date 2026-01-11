@@ -36,8 +36,11 @@ protected:
 
 	void OnAbilityFireBall();
 
+	void OnMaxManaChange(const FOnAttributeChangeData& InData);
+	void OnCurrentManaChange(const FOnAttributeChangeData& InData);
+
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "ASC|Component")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = nullptr;
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "ASC|Ability")
@@ -49,4 +52,7 @@ protected:
 private:
 	UPROPERTY()
 	TObjectPtr<UPlayerAttributeSet> PlayerAttributeSet = nullptr;
+
+	UPROPERTY()
+	TObjectPtr<class APlayerHUD> PlayerHud = nullptr;
 };

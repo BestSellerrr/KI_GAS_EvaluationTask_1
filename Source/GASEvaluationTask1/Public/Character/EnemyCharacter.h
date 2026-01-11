@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "AbilitySystemInterface.h"
+#include "GameplayEffectTypes.h"
 #include "EnemyCharacter.generated.h"
 
 class UEnemyAttributeSet;
@@ -26,10 +27,15 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	void OnCurrentHealthChange(const FOnAttributeChangeData& InData);
+	void OnMaxHealthChange(const FOnAttributeChangeData& InData);
+
 protected:
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Ability")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|Ability")
 	TObjectPtr<UAbilitySystemComponent> AbilitySystemComponent = nullptr;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Component|UI")
+	TObjectPtr<class UWidgetComponent> WidgetComponent = nullptr;
 private:
 	UPROPERTY()
 	TObjectPtr<UEnemyAttributeSet> EnemyAttributeSet = nullptr; 
