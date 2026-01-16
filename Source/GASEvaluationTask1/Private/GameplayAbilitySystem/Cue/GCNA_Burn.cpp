@@ -8,7 +8,7 @@
 
 AGCNA_Burn::AGCNA_Burn()
 {
-	GameplayCueTag = FGameplayTag::RequestGameplayTag(FName("GameplayCue.Debuff.Burn"));
+	GameplayCueTag = FGameplayTag::RequestGameplayTag(FName("GameplayCue.Debuff.Burn"), /*bErrorIfNotFound=*/ false);
 	bAutoDestroyOnRemove = true;
 }
 
